@@ -1,4 +1,4 @@
-import { entryHOF, registerHOF } from "../controllers/hof.controllers";
+import { entryHOF, registerHOF } from "../controllers/hof.controllers.js";
 import {Router} from "express";
 
 const router = Router();

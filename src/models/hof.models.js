@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const HofSchema = new mongoose.Schema({
     hof_name:{
@@ -81,11 +82,7 @@ HofSchema.pre("save", async function(next) {
 
 // Method to check if password matches
 HofSchema.methods.comparePassword = async function(candidatePassword) {
-    try {
-        return await bcrypt.compare(candidatePassword, this.password);
-    } catch (error) {
-        throw new Error(error);
-    }
+    return await bcrypt.compare(candidatePassword, this.password);
 };
 
 // Method to get member count
@@ -93,4 +90,18 @@ HofSchema.methods.getMemberCount = function() {
     return this.members_added ? this.members_added.length : 0;
 };
 
-export const Hof = mongoose.model("HOF", HofSchema);
+HofSchema.methods.generateAccessToken = function(){
+    return jwt.sign(
+        {
+            _id:this._id,
+            email:this.email,
+            username:this.username,
+            time:this.createdAt
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn:process.env.ACCESS_TOKEN_EXPIRY
+        }
+    )
+}
+export const Hof = mongoose.model("Hof", HofSchema);

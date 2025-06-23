@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createFamily, modifyFamily, removeFamily, viewFamily } from "../controllers/family.controllers";
+import { createFamily, modifyFamily, removeFamily, viewFamily } from "../controllers/family.controllers.js";
 
 const router = Router();
 

@@ -1,6 +1,17 @@
 import { Hof } from "../models/hof.models.js";
 import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 import {asyncHandler} from "../utils/asyncHandler.js"
+
+const generateAccessToken = async (hofID) => {
+    try {
+        const hof = await Hof.findOne(hofID)
+        const accessToken = hof.generateAccessToken();
+        return { accessToken };
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong. While generating hof accesstoken...");
+    }
+}
 
 const registerHOF = asyncHandler(async(req,res)=>{
     const {
@@ -8,7 +19,7 @@ const registerHOF = asyncHandler(async(req,res)=>{
         email,
         password,
         phone,
-        dob,
+        dob, // YYYY-MM-DD
         // address,
         picture,
         gender,
@@ -20,9 +31,8 @@ const registerHOF = asyncHandler(async(req,res)=>{
         throw new ApiError(409,"All fields are mandatory. for hof creation..")
     }
 
-    const existedHof = await Hof.findOne({
-        $or : {email}
-    })
+    const existedHof = await Hof.findOne({hof_email:email})
+
     if(existedHof){
         throw new ApiError(409,"Head of family already existed with same email.")
     }
@@ -55,7 +65,26 @@ const registerHOF = asyncHandler(async(req,res)=>{
 })
 
 const entryHOF = asyncHandler(async(req,res)=>{
+    const {email,password} = req.body;
 
+    const hof = await Hof.findOne({hof_email:email}).select("+password");
+
+    const verifyPassword = await hof.comparePassword(password);
+    
+    if(!verifyPassword){
+        throw new ApiError(401,"Invalid credentials. Try again...");
+    }
+
+    const {HaccessToken} = await generateAccessToken(Hof._id);
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+    res.setHeader('Authorization', `Bearer ${HaccessToken}`);
+    return res.status(200)
+        .cookie("HaccessToken", HaccessToken, options)
+        .json(new ApiResponse(200,{},"User logged in successfully"))
 })
 
 export {
