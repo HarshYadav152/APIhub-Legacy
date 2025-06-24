@@ -139,11 +139,9 @@ UserSchema.methods.generateAccessToken = function () {
             email: this.email,
             time: this.createdAt
         },
-        // process.env.ACCESS_TOKEN_SECRET,
-        '523eyfdeiwxtqv4r34tqt4tr9q3xy4r9834yfioerhfiorygf9v',
+        process.env.ACCESS_TOKEN_SECRET,
         {
-            // expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-            expiresIn:'1d'
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
         }
     )
 }

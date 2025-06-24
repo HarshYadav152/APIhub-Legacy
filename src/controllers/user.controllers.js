@@ -6,7 +6,6 @@ import { User } from "../models/user.models.js"
 const generateUAccessToken = async (userID) => {
     try {
         const user = await User.findById(userID)
-        console.log("User found by id : ",user)
         const UaccessToken = user.generateAccessToken();
         return { UaccessToken };
     } catch (error) {
@@ -57,10 +56,7 @@ const loginUser = asyncHandler(async (req, res) => {
     if (!member) {
         throw new ApiError(409, "User not existed. Please create one...")
     }
-    // console.log("password : ",upassword)
-    // console.log("till password")
     const verifyPassword = await member.comparePassword(upassword)
-    // console.log("till password 2")
 
     if (!verifyPassword) {
         throw new ApiError(401, "Invalid credentials. Try with different (you have only 3 attempts and you will temporary blocked.)")

@@ -58,7 +58,6 @@ const addMembers = asyncHandler(async (req, res) => {
     } catch (error) {
         throw new ApiError(500, "Error adding member to family : " + error.message);
     }
-
 });
 
 const removeMembers = asyncHandler(async (req, res) => {
