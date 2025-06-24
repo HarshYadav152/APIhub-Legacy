@@ -1,7 +1,10 @@
 import { Router } from "express";
+import { loginUser, registerUser } from "../controllers/user.controllers.js";
 
 const router = Router();
 
-router.route("/")
+// unsecured router for register and login
+router.route("/register-user").post(registerUser)
+router.route("/login-user").post(loginUser)
 
 export default router;

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const UserSchema = new mongoose.Schema({
     full_name: {
@@ -47,11 +48,11 @@ const UserSchema = new mongoose.Schema({
         type: String,
         enum: ["single", "married", "divorced", "widowed", "other"]
     },
-    occupation: {
-        type: String,
-        trim: true,
-        default: "Not Specified"
-    },
+    // occupation: {
+    //     type: String,
+    //     trim: true,
+    //     default: "Not Specified"
+    // },
     education: {
         institution: { type: String, default: "Not specified" },
         degree: { type: String, default: "Not specified" },
@@ -85,18 +86,13 @@ const UserSchema = new mongoose.Schema({
     },
     is_active: {
         type: Boolean,
-        default: true
+        default: false
     },
     last_login: {
         type: Date
     }
 }, {
     timestamps: true
-});
-
-// Virtual for full name
-UserSchema.virtual("full_name").get(function () {
-    return `${this.first_name} ${this.last_name}`;
 });
 
 // Password hashing middleware
@@ -114,11 +110,7 @@ UserSchema.pre("save", async function (next) {
 
 // Method to check if password matches
 UserSchema.methods.comparePassword = async function (candidatePassword) {
-    try {
-        return await bcrypt.compare(candidatePassword, this.password);
-    } catch (error) {
-        throw new Error(error);
-    }
+    return await bcrypt.compare(candidatePassword, this.password);
 };
 
 // Method to update last login
@@ -139,5 +131,21 @@ UserSchema.methods.getAge = function () {
     }
     return age;
 };
+
+UserSchema.methods.generateAccessToken = function () {
+    return jwt.sign(
+        {
+            _id: this._id,
+            email: this.email,
+            time: this.createdAt
+        },
+        // process.env.ACCESS_TOKEN_SECRET,
+        '523eyfdeiwxtqv4r34tqt4tr9q3xy4r9834yfioerhfiorygf9v',
+        {
+            // expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+            expiresIn:'1d'
+        }
+    )
+}
 
 export const User = mongoose.model("User", UserSchema);

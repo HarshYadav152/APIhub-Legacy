@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "legacy": "node ./src/index.js",
+    "legacy": "nodemon ./src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -23,6 +23,7 @@
     "jsonwebtoken": "^9.0.2",
     "jwt": "^0.2.0",
     "mongod": "^2.0.0",
-    "mongoose": "^8.15.2"
+    "mongoose": "^8.15.2",
+    "nodemon": "^3.1.10"
   }
 }

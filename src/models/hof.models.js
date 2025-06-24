@@ -94,8 +94,7 @@ HofSchema.methods.generateAccessToken = function(){
     return jwt.sign(
         {
             _id:this._id,
-            email:this.email,
-            username:this.username,
+            email:this.hof_email,
             time:this.createdAt
         },
         process.env.ACCESS_TOKEN_SECRET,
