@@ -1,5 +1,6 @@
 import { Family } from "../models/family.models.js";
 import { Hof } from "../models/hof.models.js";
+import {User} from "../models/user.models.js"
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js"
@@ -39,28 +40,71 @@ const createFamily = asyncHandler(async (req, res) => {
 
 const addMembers = asyncHandler(async (req, res) => {
     const { userId } = req.params;
+    console.log("user id is : ", userId)
     const hof_id = req.hof._id;
 
+    if (!userId) {
+        throw new ApiError(400, "User ID is required");
+    }
+
     try {
-        const family = await Family.findOne({
-            head_of_family: hof_id
-        })
-        if (!family) {
-            throw new ApiError(409, { "message": "Family not found to add members..." });
+        const userExist = await User.findById(userId);
+        if(!userExist){
+            return res.status(400).json(
+            new ApiResponse(400, {
+                membersAdded: false,
+                memberCount: family.getMemberCount()
+            }, "User doesnot exist. Please create a user first...")
+        );
         }
 
+        const family = await Family.findOne({
+            head_of_family: hof_id
+        });
+
+        if (!family) {
+            throw new ApiError(404, "Family not found to add members");
+        }
+
+        // Clean up any null members that might exist
+        if (Array.isArray(family.members)) {
+            family.members = family.members.filter(member => member !== null);
+        }
+
+        const alreadyHasMember = family.hasMember(userId);
+        if (alreadyHasMember) {
+            return res.status(200).json(
+                new ApiResponse(200, {
+                    membersAdded: false,
+                    memberCount: family.getMemberCount()
+                }, "User is already a member of this family")
+            );
+        }
+
+        // Add member
         family.addMember(userId);
+
+        // Log members for debugging
+        console.log("Members after adding:", family.members);
+
         await family.save();
 
         return res.status(200).json(
-            new ApiResponse(200, { membersAdded: true }, "Member added successfully to family...")
+            new ApiResponse(200, {
+                membersAdded: true,
+                memberCount: family.getMemberCount()
+            }, "Member added successfully to family")
         );
     } catch (error) {
-        throw new ApiError(500, "Error adding member to family : " + error.message);
+        return res.status(500).json(
+            new ApiResponse(500, {
+                membersAdded: false,
+            }, error.message)
+        );
     }
 });
 
-const removeMembers = asyncHandler(async (req, res) => {
+const removeMember = asyncHandler(async (req, res) => {
     const { userId } = req.params;
     const hof_id = req.hof._id;
 
@@ -75,8 +119,11 @@ const removeMembers = asyncHandler(async (req, res) => {
 
         // Check if user is a member before removing
         if (!family.hasMember(userId)) {
-            throw new ApiError(400, "User is not a member of this family");
+            return res.status(400).json(
+                new ApiResponse(400, { memberRemoved: false }, "Member is not a family member...")
+            );
         }
+
 
         family.removeMember(userId);
         await family.save();
@@ -85,7 +132,9 @@ const removeMembers = asyncHandler(async (req, res) => {
             new ApiResponse(200, { memberRemoved: true }, "Member removed successfully from family")
         );
     } catch (error) {
-        throw new ApiError(500, "Error removing member from family: " + error.message);
+        return res.status(500).json(
+            new ApiResponse(500, { memberRemoved: false }, error.message)
+        );
     }
 });
 
@@ -127,12 +176,18 @@ const getAllFamilyMembers = asyncHandler(async (req, res) => {
             throw new ApiError(404, "Family not found");
         }
 
+        // Clean up nulls before populating
+        if (Array.isArray(family.members)) {
+            family.members = family.members.filter(member => member !== null);
+            await family.save(); // Save the cleaned members array
+        }
+
         // Populate the members array with user details
         // Assuming User model has relevant fields like name, profile_picture, etc.
         const populatedFamily = await Family.findById(family._id)
             .populate({
                 path: 'members',
-                select: 'name profile_picture email phone_number date_of_birth gender relationship',
+                select: 'full_name profile_picture email phone_number date_of_birth gender relationship',
                 options: { sort: { name: 1 } } // Sort by name alphabetically
             })
             .select('family_name members');
@@ -144,7 +199,7 @@ const getAllFamilyMembers = asyncHandler(async (req, res) => {
         // Format the response for frontend consumption
         const formattedMembers = populatedFamily.members.map(member => ({
             id: member._id,
-            name: member.name,
+            name: member.full_name,
             profileImage: member.profile_picture,
             email: member.email,
             phone: member.phone_number,
@@ -165,23 +220,12 @@ const getAllFamilyMembers = asyncHandler(async (req, res) => {
     }
 })
 
-const viewFamily = asyncHandler(async (req, res) => {
-
-});
-
-const modifyFamily = asyncHandler(async (req, res) => {
-
-});
-
-const removeFamily = asyncHandler(async (req, res) => {
-
-});
-
 export {
     createFamily,
     addMembers,
-    removeMembers,
+    removeMember,
     getMembersCount,
+    getAllFamilyMembers,
     viewFamily,
     modifyFamily,
     removeFamily,

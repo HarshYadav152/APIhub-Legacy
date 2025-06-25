@@ -73,7 +73,12 @@ const loginUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, { UaccessToken }, "user logged in successfully..."))
 })
 
+const completeMemberProfile = asyncHandler(async(res,req)=>{
+    
+})
+
 export {
     registerUser,
-    loginUser
+    loginUser,
+    completeMemberProfile
 }

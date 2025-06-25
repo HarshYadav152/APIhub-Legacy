@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addMembers, createFamily, getMembersCount, modifyFamily, removeFamily, viewFamily } from "../controllers/family.controllers.js";
+import { addMembers, createFamily, getAllFamilyMembers, getMembersCount, modifyFamily, removeFamily, removeMember, viewFamily } from "../controllers/family.controllers.js";
 import {verifyHof} from "../middlewares/verifyHof.middleware.js"
 
 const router = Router();
@@ -10,8 +10,10 @@ const router = Router();
 router.route("/create").post(verifyHof,createFamily);
 
 // add family members
-router.route("/add-members").post(verifyHof,addMembers)
+router.route("/add-member/:userId").post(verifyHof,addMembers)
+router.route("/remove-member/:userId").post(verifyHof,removeMember)
 router.route("/total-member").get(verifyHof,getMembersCount)
+router.route("/get-all-members").get(verifyHof,getAllFamilyMembers)
 
 router.route("/view").post(verifyHof,viewFamily);
 

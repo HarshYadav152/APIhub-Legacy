@@ -64,20 +64,65 @@ FamilySchema.methods.getMemberCount = function() {
 
 // Method to check if user is a member of the family
 FamilySchema.methods.hasMember = function(userId) {
-    return this.members.some(member => member.toString() === userId.toString());
+    if (!userId || !this.members) return false;
+    
+    const userIdStr = userId.toString();
+    
+    return this.members.some(member => {
+        if (!member) return false;
+        
+        try {
+            return member.toString() === userIdStr;
+        } catch (error) {
+            return false;
+        }
+    });
 };
 
 // Method to add a member to the family
 FamilySchema.methods.addMember = function(userId) {
-    if (!this.hasMember(userId)) {
-        this.members.push(userId);
+    if (!userId) {
+        console.warn('Attempted to add null/undefined user ID');
+        return this;
     }
+    
+    // Convert string IDs to ObjectId if necessary
+    let userObjectId;
+    try {
+        if (typeof userId === 'string') {
+            userObjectId = new mongoose.Types.ObjectId(userId);
+        } else if (userId instanceof mongoose.Types.ObjectId) {
+            userObjectId = userId;
+        } else {
+            userObjectId = userId; // Assume it's already in the correct format
+        }
+        
+        // Only add if not already a member
+        if (!this.hasMember(userObjectId)) {
+            this.members.push(userObjectId);
+        }
+    } catch (error) {
+        console.error('Invalid user ID format:', error);
+    }
+    
     return this;
 };
 
 // Method to remove a member from the family
 FamilySchema.methods.removeMember = function(userId) {
-    this.members = this.members.filter(member => member.toString() !== userId.toString());
+    // Convert userId to string once for comparison
+    const userIdStr = userId.toString();
+
+    // this.members = this.members.filter(member => member.toString() !== userId.toString());
+    this.members = this.members.filter(member=>{
+        if(!member) return true;
+
+        try{
+            return member.toString() !== userIdStr;
+        }catch(error){
+            return true;
+        }
+    });
     return this;
 };
 export const Family = mongoose.model("Family", FamilySchema);
