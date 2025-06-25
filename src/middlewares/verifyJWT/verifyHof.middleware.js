@@ -1,7 +1,7 @@
-import { ApiError } from "../utils/ApiError.js"
-import { asyncHandler } from "../utils/asyncHandler.js"
+import { ApiError } from "../../utils/ApiError.js"
+import { asyncHandler } from "../../utils/asyncHandler.js"
 import jwt from "jsonwebtoken"
-import { Hof } from "../models/hof.models.js"
+import { Hof } from "../../models/hof.models.js"
 
 export const verifyHof = asyncHandler(async (req,_,next) => {
     try {

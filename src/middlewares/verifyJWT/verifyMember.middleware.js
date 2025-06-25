@@ -1,7 +1,7 @@
-import { ApiError } from "../utils/ApiError.js"
-import { asyncHandler } from "../utils/asyncHandler.js"
+import { ApiError } from "../../utils/ApiError.js"
+import { asyncHandler } from "../../utils/asyncHandler.js"
 import jwt from "jsonwebtoken"
-import { User } from "../models/user.models.js"
+import { User } from "../../models/user.models.js"
 
 export const verifyMember = asyncHandler(async (req, res, next) => {
     try {
@@ -27,7 +27,7 @@ export const verifyMember = asyncHandler(async (req, res, next) => {
             );
         }
 
-        req.hof = hof;
+        req.user = user;
         next();
     } catch (error) {
         return res.status(401).json(

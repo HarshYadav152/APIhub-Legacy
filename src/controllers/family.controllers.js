@@ -230,7 +230,7 @@ export {
     removeMember,
     getMembersCount,
     getAllFamilyMembers,
-    viewFamily,
-    modifyFamily,
-    removeFamily,
+    // viewFamily,
+    // modifyFamily,
+    // removeFamily,
 }
