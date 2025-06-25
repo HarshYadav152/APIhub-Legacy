@@ -83,10 +83,10 @@ const addMembers = asyncHandler(async (req, res) => {
 
         // Add member
         family.addMember(userId);
+        await User.findByIdAndUpdate(userId, { family:family._id,isActive: true });
 
         // Log members for debugging
         console.log("Members after adding:", family.members);
-
         await family.save();
 
         return res.status(200).json(
@@ -124,9 +124,13 @@ const removeMember = asyncHandler(async (req, res) => {
             );
         }
 
-
         family.removeMember(userId);
         await family.save();
+
+        await User.findByIdAndUpdate(userId, { 
+            $unset: { family: 1 }, // Remove the family field
+            isActive: false // Set isActive to false
+        });
 
         return res.status(200).json(
             new ApiResponse(200, { memberRemoved: true }, "Member removed successfully from family")
