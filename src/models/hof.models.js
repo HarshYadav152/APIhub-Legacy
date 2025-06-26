@@ -63,7 +63,24 @@ const HofSchema = new mongoose.Schema({
         type: String,
         default: "head_of_family",
         enum: ["head_of_family", "admin"]
-    }
+    },
+    isEmailVerified: {
+        type: Boolean,
+        default: false
+    },
+    emailVerificationToken: {
+        type: String
+    },
+    emailVerificationExpiry: {
+        type: Date
+    },
+    verificationAttempts: {
+        type: Number,
+        default: 0
+    },
+    lastVerificationAttempt: {
+        type: Date
+    },
 },{
     timestamps:true
 });

@@ -1,10 +1,10 @@
 // controllers/verification.controllers.js
-import { User } from '../models/user.models.js';
-import { Hof } from '../models/hof.models.js';
-import { ApiResponse } from '../utils/ApiResponse.js';
-import { asyncHandler } from '../utils/asyncHandler.js';
-import { generateOTP, hashOTP, getOtpExpiry } from '../utils/services/otp/otp.service.js';
-import { sendVerificationEmail } from '../utils/services/mail/email.service.js';
+import { User } from '../../models/user.models.js';
+import { Hof } from '../../models/hof.models.js';
+import { ApiResponse } from '../../utils/ApiResponse.js';
+import { asyncHandler } from '../../utils/asyncHandler.js';
+import { generateOTP, hashOTP, getOtpExpiry } from '../../utils/services/otp/otp.service.js';
+import { sendVerificationEmail } from '../../utils/services/mail/email.service.js';
 
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_TIME = 60 * 60 * 1000; // 1 hour in milliseconds
@@ -110,14 +110,20 @@ export const verifyOTP = asyncHandler(async (req, res) => {
             new ApiResponse(400, null, "Email and OTP are required")
         );
     }
+    let searchField = 'email';
+    if (role === 'hof') {
+        searchField = 'hof_email'; // Use this if your HOF model uses a different field name
+    }
 
     // Determine which model to use
     const Model = role === 'hof' ? Hof : User;
 
+     const query = {};
+    query[searchField] = email;
     try {
         // Find user by email
         const user = await Model.findOne({
-            email,
+            ...query,
             emailVerificationExpiry: { $gt: new Date() } // Check if OTP is not expired
         });
 
