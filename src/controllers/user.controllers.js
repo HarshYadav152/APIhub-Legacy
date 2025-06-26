@@ -2,7 +2,9 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { User } from "../models/user.models.js"
-import { uploadingFileonCloudinary } from "../utils/fileUpload/cloudinary.services.js";
+import { uploadingFileonCloudinary } from "../utils/services/fileUpload/cloudinary.services.js";
+import { generateOTP, getOtpExpiry, hashOTP } from "../utils/services/otp/otp.service.js";
+import { sendVerificationEmail } from "../utils/services/mail/email.service.js";
 
 const generateUAccessToken = async (userID) => {
     try {
@@ -42,10 +44,22 @@ const registerUser = asyncHandler(async (req, res) => {
     if (!createdUser) {
         throw new ApiError(409, "Something wrong while creating user...")
     }
+    const otp = generateOTP();
+    const hashedOTP = hashOTP(otp);
+
+    user.emailVerificationToken = hashedOTP;
+    user.emailVerificationExpiry = getOtpExpiry();
+    await user.save();
+
+    // Send verification email
+    await sendVerificationEmail(user.email, otp);
 
     return res.status(201).json(
-        new ApiResponse(200, {}, "User created successfully.")
-    )
+        new ApiResponse(201, { userId: user._id, needsVerification: true }, "User registered. Please verify your email.")
+    );
+    // return res.status(201).json(
+    //     new ApiResponse(200, {}, "User created successfully.")
+    // )
 
 })
 
@@ -110,10 +124,10 @@ const completeMemberProfile = asyncHandler(async (req, res) => {
             relationship_status: rstatus,
             relationship_to_hof: rtohof,
         },
-        {new:true,runValidators:true}
+        { new: true, runValidators: true }
     ).select("-password")
 
-    if(!updatedUser){
+    if (!updatedUser) {
         return res.status(404).json(
             new ApiResponse(404, null, "User not found. for updating profile...")
         );

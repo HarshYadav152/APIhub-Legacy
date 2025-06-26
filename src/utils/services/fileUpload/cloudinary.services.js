@@ -3,12 +3,9 @@ import fs from "fs"
 import path from "path";
 
 cloudinary.config({
-    // cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    cloud_name: "everywherebackend",
-    // api_key: process.env.CLOUDINARY_API_KEY,
-    api_key: "314433164929983",
-    // api_secret: process.env.CLOUDINARY_API_SECRET
-    api_secret:"yjXRCWCG9KqmubNFzg2Qigbvuzo"
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 const uploadingFileonCloudinary = async(localFilePath) => {

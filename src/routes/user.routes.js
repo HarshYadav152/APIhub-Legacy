@@ -2,6 +2,7 @@ import { Router } from "express";
 import { completeMemberProfile, loginUser, registerUser } from "../controllers/user.controllers.js";
 import { verifyMember } from "../middlewares/verifyJWT/verifyMember.middleware.js";
 import { upload } from "../middlewares/multers/member.multer.middleware.js";
+import { verifyFamilyMember } from "../middlewares/verifyJWT/verifyFamilyMembers.middleware.js";
 
 const router = Router();
 

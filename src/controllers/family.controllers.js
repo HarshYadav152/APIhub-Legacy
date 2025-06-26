@@ -114,7 +114,9 @@ const removeMember = asyncHandler(async (req, res) => {
         });
 
         if (!family) {
-            throw new ApiError(404, "Family not found");
+            return res.status(401).json(
+                new ApiResponse(401,null,"family not found.")
+            )
         }
 
         // Check if user is a member before removing

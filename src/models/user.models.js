@@ -90,7 +90,24 @@ const UserSchema = new mongoose.Schema({
     },
     last_login: {
         type: Date
-    }
+    },
+    isEmailVerified: {
+        type: Boolean,
+        default: false
+    },
+    emailVerificationToken: {
+        type: String
+    },
+    emailVerificationExpiry: {
+        type: Date
+    },
+    verificationAttempts: {
+        type: Number,
+        default: 0
+    },
+    lastVerificationAttempt: {
+        type: Date
+    },
 }, {
     timestamps: true
 });
