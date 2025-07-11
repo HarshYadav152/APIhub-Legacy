@@ -90,7 +90,7 @@ Backend/
 - `POST /legacy/api/v1/verify/verify-otp` - Verify OTP
 - `GET /legacy/api/v1/verify/status` - Check verification status
 
-### Media & Messaging (E2E Encrypted)
+### Media & Messaging (E2E Encrypted) in development phase not completed
 - `POST /media/keys/generate` - Generate Signal Protocol keys
 - `POST /media/keys/register` - Register Signal Protocol keys
 - `GET /media/keys/family/:familyId` - Get family Signal Protocol keys
