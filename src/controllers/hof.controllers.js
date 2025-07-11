@@ -87,7 +87,7 @@ const entryHOF = asyncHandler(async (req, res) => {
     res.setHeader('Authorization', `Bearer ${HaccessToken}`);
     return res.status(200)
         .cookie("HaccessToken", HaccessToken, options)
-        .json(new ApiResponse(200, {HaccessToken}, "User logged in successfully"))
+        .json(new ApiResponse(200, {HaccessToken,hof_id:hof._id}, "User logged in successfully"))
 })
 
 export {

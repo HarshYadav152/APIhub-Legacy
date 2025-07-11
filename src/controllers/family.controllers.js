@@ -37,10 +37,10 @@ const createFamily = asyncHandler(async (req, res) => {
         );
 
         return res.status(201).json(
-            new ApiResponse(201, { 
+            new ApiResponse(201, {
                 familyCreated: true,
-                familyId:family._id,
-                memberCount:1
+                familyId: family._id,
+                memberCount: 1
             }, "Family created successfully...")
         )
     } catch (error) {
@@ -50,6 +50,16 @@ const createFamily = asyncHandler(async (req, res) => {
         });
     }
 });
+
+const getId = asyncHandler(async (req, res) => {
+    const hof_id = req.hof._id;
+
+    const hof = await Hof.findById(hof_id);
+    const family_id = hof.family_created;
+    return res.status(200).json(
+        new ApiResponse(200, { family_id },"Family id retrived")
+    )
+})
 
 const addMembers = asyncHandler(async (req, res) => {
     const { userId } = req.params;
@@ -390,4 +400,5 @@ export {
     viewFamilyAsMember,
     // modifyFamily,
     // removeFamily,
+    getId
 }

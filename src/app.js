@@ -17,11 +17,11 @@ app.use(cookieParser())
 import userRouter from "./routes/user.routes.js";
 import hofRouter from "./routes/hof.routes.js";
 import familyRouter from "./routes/family.routes.js";
-import verifyRouter from "./routes/verification.routes.js"
+import verifyRouter from "./routes/verification.routes.js";
 
 // route declaration
 app.use("/legacy/api/v1/members", userRouter)
-app.use("/legacy/api/v1/hof/", hofRouter)
+app.use("/legacy/api/v1/hof", hofRouter)
 app.use("/legacy/api/v1/family",familyRouter)
 
 // secured routes for email verification

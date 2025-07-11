@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addMembers, createFamily, getAllFamilyMembers, getMembersCount, removeMember, viewFamilyAsHof, viewFamilyAsMember} from "../controllers/family.controllers.js";
+import { addMembers, createFamily, getAllFamilyMembers, getId, getMembersCount, removeMember, viewFamilyAsHof, viewFamilyAsMember} from "../controllers/family.controllers.js";
 import {verifyHof} from "../middlewares/verifyJWT/verifyHof.middleware.js"
 import { requireEmailVerification } from "../middlewares/verifyEmail.middleware.js";
 import { verifyFamilyMember } from "../middlewares/verifyJWT/verifyFamilyMembers.middleware.js";
@@ -28,6 +28,7 @@ router.route("/get-all-members").get(verifyHof,getAllFamilyMembers)
 
 // for hof family view
 router.route("/view-hof").post(verifyHof,viewFamilyAsHof);
+router.route("/get-id").get(verifyHof,getId)
 
 // fro member family view
 router.route("/view-member").post(verifyMember,verifyFamilyMember,viewFamilyAsMember);
