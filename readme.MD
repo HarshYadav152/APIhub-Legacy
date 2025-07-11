@@ -19,7 +19,7 @@ APIhub Legacy is a Node.js backend service that provides secure family managemen
   - Add and remove family members
   - View family details based on user role (HOF or Member)
 
-- **Secure Communication**
+- **Secure Communication (work in progress)**
   - End-to-end encrypted messaging using the Signal Protocol
   - Secure key management and registration
   - Private family messaging
