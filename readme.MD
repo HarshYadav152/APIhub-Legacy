@@ -133,14 +133,19 @@ npm install --force
 3. Create a `.env` file in the root directory with the following variables:
 
 ```bash 
-PORT=3000 MONGODB_URI=mongodb://localhost:27017/apihub_legacy ACCESS_TOKEN_SECRET=your_secret_key_here ACCESS_TOKEN_EXPIRY=1d
+PORT=3000 
+MONGODB_URI=mongodb://localhost:27017/apihub_legacy ACCESS_TOKEN_SECRET=your_secret_key_here 
+ACCESS_TOKEN_EXPIRY=1d
 
-Cloudinary Config
-CLOUDINARY_CLOUD_NAME=your_cloud_name CLOUDINARY_API_KEY=your_api_key CLOUDINARY_API_SECRET=your_api_secret
+# Cloudinary Config
+CLOUDINARY_CLOUD_NAME=your_cloud_name 
+CLOUDINARY_API_KEY=your_api_key 
+CLOUDINARY_API_SECRET=your_api_secret
 
-Email Config
-EMAIL_SERVICE=gmail FROM_EMAIL=your_email@gmail.com APP_PASSWORD=your_app_password
-```
+# Email Config
+EMAIL_SERVICE=gmail 
+FROM_EMAIL=your_email@gmail.com 
+APP_PASSWORD=your_app_password```
 
 4. Start th server
 ```bash
