@@ -79,5 +79,6 @@ const healthCheck = async (req, res) => {
 };
 
 app.get('/health', healthCheck); 
+app.get('/', healthCheck); 
 
 export { app };

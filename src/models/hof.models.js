@@ -44,7 +44,6 @@ const HofSchema = new mongoose.Schema({
     },
     marital_status: {
         type: String,
-        default:"married",
         enum: ["single", "married", "divorced", "widowed", "other"],
     },
     // occupation: {
