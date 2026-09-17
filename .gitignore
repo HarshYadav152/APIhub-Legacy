@@ -1,0 +1,24 @@
+
+!public/temp/.gitkeep
+# Dependencies
+# Editor
+# Environment
+# Logs
+# OS
+# Test coverage
+# Uploads (temp storage)
+*.log
+*.swp
+.DS_Store
+.env
+.env.*.local
+.env.local
+.husky/_
+.idea/
+.vscode/
+Thumbs.db
+coverage/
+logs/
+node_modules/
+npm-debug.log*
+public/temp/*
