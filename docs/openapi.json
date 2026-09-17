@@ -1,0 +1,1208 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "APIhub Backend",
+    "version": "0.6.0",
+    "description": "Family-management backend API. Generated from this codebase's Zod validation schemas (scripts/generate-openapi.js) rather than hand-maintained, so it can't silently drift from what the API actually accepts. Regenerate with `npm run docs:generate`."
+  },
+  "servers": [
+    {
+      "url": "/api/v1"
+    }
+  ],
+  "components": {
+    "schemas": {},
+    "parameters": {},
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "UaccessToken / HaccessToken (or an Authorization: Bearer header)"
+      }
+    }
+  },
+  "paths": {
+    "/members/register-user": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Register a new family member account",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uname": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "uemail": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "upassword": {
+                    "type": "string",
+                    "minLength": 8
+                  }
+                },
+                "required": [
+                  "uname",
+                  "uemail",
+                  "upassword"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Registered, pending email verification"
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "409": {
+            "description": "Email already registered"
+          }
+        }
+      }
+    },
+    "/members/login-user": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Log in and receive access + refresh token cookies",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uemail": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "upassword": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "uemail",
+                  "upassword"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logged in"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/members/refresh-token": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Rotate an access/refresh token pair",
+        "responses": {
+          "200": {
+            "description": "New token pair issued"
+          },
+          "401": {
+            "description": "Missing, invalid, expired, or already-used refresh token"
+          }
+        }
+      }
+    },
+    "/members/logout": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Revoke the current refresh token and clear auth cookies",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logged out"
+          },
+          "401": {
+            "description": "Not authenticated"
+          }
+        }
+      }
+    },
+    "/members/complete-profile": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Complete a member's profile (multipart form; requires an uploaded file not represented in this schema)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "number": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "dob": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "gender": {
+                    "type": "string",
+                    "enum": [
+                      "male",
+                      "female",
+                      "other",
+                      "prefer not to say"
+                    ]
+                  },
+                  "street": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "city": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "country": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "pincode": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "rstatus": {
+                    "type": "string",
+                    "enum": [
+                      "single",
+                      "married",
+                      "divorced",
+                      "widowed",
+                      "other"
+                    ]
+                  },
+                  "rtohof": {
+                    "type": "string",
+                    "enum": [
+                      "spouse",
+                      "child",
+                      "sibling",
+                      "parent",
+                      "grandparent",
+                      "grandchild",
+                      "other"
+                    ]
+                  }
+                },
+                "required": [
+                  "number",
+                  "dob",
+                  "gender",
+                  "street",
+                  "city",
+                  "country",
+                  "pincode",
+                  "rstatus",
+                  "rtohof"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated"
+          },
+          "400": {
+            "description": "Validation error or missing file"
+          },
+          "401": {
+            "description": "Not authenticated"
+          }
+        }
+      }
+    },
+    "/hof/register": {
+      "post": {
+        "tags": [
+          "HOF"
+        ],
+        "summary": "Register a new head-of-family account",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 8
+                  }
+                },
+                "required": [
+                  "name",
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Registered"
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "409": {
+            "description": "Email already registered"
+          }
+        }
+      }
+    },
+    "/hof/entry": {
+      "post": {
+        "tags": [
+          "HOF"
+        ],
+        "summary": "Log in as a head of family",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logged in"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/hof/refresh-token": {
+      "post": {
+        "tags": [
+          "HOF"
+        ],
+        "summary": "Rotate an access/refresh token pair",
+        "responses": {
+          "200": {
+            "description": "New token pair issued"
+          },
+          "401": {
+            "description": "Missing, invalid, expired, or already-used refresh token"
+          }
+        }
+      }
+    },
+    "/hof/logout": {
+      "post": {
+        "tags": [
+          "HOF"
+        ],
+        "summary": "Revoke the current refresh token and clear auth cookies",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logged out"
+          },
+          "401": {
+            "description": "Not authenticated"
+          }
+        }
+      }
+    },
+    "/hof/complete-profile": {
+      "post": {
+        "tags": [
+          "HOF"
+        ],
+        "summary": "Complete a HOF's profile (multipart form; requires an uploaded file not represented in this schema)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "number": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "dob": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "gender": {
+                    "type": "string",
+                    "enum": [
+                      "male",
+                      "female",
+                      "other",
+                      "prefer not to say"
+                    ]
+                  },
+                  "mstatus": {
+                    "type": "string",
+                    "enum": [
+                      "single",
+                      "married",
+                      "divorced",
+                      "widowed",
+                      "other"
+                    ]
+                  }
+                },
+                "required": [
+                  "number",
+                  "dob",
+                  "gender",
+                  "mstatus"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated"
+          },
+          "400": {
+            "description": "Validation error or missing file"
+          },
+          "401": {
+            "description": "Not authenticated"
+          }
+        }
+      }
+    },
+    "/verify/send-otp": {
+      "post": {
+        "tags": [
+          "Verification"
+        ],
+        "summary": "Send a one-time verification code to an email",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "user",
+                      "hof"
+                    ],
+                    "default": "user"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP sent (or already verified)"
+          },
+          "404": {
+            "description": "No matching account"
+          },
+          "429": {
+            "description": "Too many attempts"
+          }
+        }
+      }
+    },
+    "/verify/verify-otp": {
+      "post": {
+        "tags": [
+          "Verification"
+        ],
+        "summary": "Verify a one-time code",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "otp": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "user",
+                      "hof"
+                    ],
+                    "default": "user"
+                  }
+                },
+                "required": [
+                  "email",
+                  "otp"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email verified"
+          },
+          "400": {
+            "description": "Invalid or expired OTP"
+          }
+        }
+      }
+    },
+    "/verify/status": {
+      "get": {
+        "tags": [
+          "Verification"
+        ],
+        "summary": "Get the calling user's verification status",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verification status"
+          }
+        }
+      }
+    },
+    "/verify/hof-status": {
+      "get": {
+        "tags": [
+          "Verification"
+        ],
+        "summary": "Get the calling HOF's verification status",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verification status"
+          }
+        }
+      }
+    },
+    "/verify/revoke-member/{email}": {
+      "post": {
+        "tags": [
+          "Verification"
+        ],
+        "summary": "Revoke a family member's email verification (must be in the calling HOF's own family)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "required": true,
+            "name": "email",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Revoked"
+          },
+          "403": {
+            "description": "Target is not a member of the calling HOF's family"
+          },
+          "404": {
+            "description": "No matching account"
+          }
+        }
+      }
+    },
+    "/verify/revoke-hof/{email}": {
+      "post": {
+        "tags": [
+          "Verification"
+        ],
+        "summary": "Revoke your own HOF email verification (self only)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "required": true,
+            "name": "email",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Revoked"
+          },
+          "403": {
+            "description": "Email does not match the calling HOF"
+          }
+        }
+      }
+    },
+    "/family/create": {
+      "post": {
+        "tags": [
+          "Family"
+        ],
+        "summary": "Create a family (HOF only, requires verified email)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fname": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "fdesc": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "fpicture": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "estd": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "fname",
+                  "fdesc",
+                  "fpicture",
+                  "estd"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Family created"
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "403": {
+            "description": "Email not verified"
+          },
+          "409": {
+            "description": "HOF already has a family"
+          }
+        }
+      }
+    },
+    "/family/add-member/{userId}": {
+      "post": {
+        "tags": [
+          "Family"
+        ],
+        "summary": "Add an existing user to the calling HOF's family",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Member added (or already present)"
+          },
+          "400": {
+            "description": "Invalid userId or user does not exist"
+          },
+          "403": {
+            "description": "Email not verified"
+          }
+        }
+      }
+    },
+    "/family/remove-member/{userId}": {
+      "post": {
+        "tags": [
+          "Family"
+        ],
+        "summary": "Remove a member from the calling HOF's family",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Member removed"
+          },
+          "400": {
+            "description": "Member is not in this family"
+          }
+        }
+      }
+    },
+    "/family/total-member": {
+      "get": {
+        "tags": [
+          "Family"
+        ],
+        "summary": "Get the calling HOF's family member count",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Member count"
+          }
+        }
+      }
+    },
+    "/family/get-all-members": {
+      "get": {
+        "tags": [
+          "Family"
+        ],
+        "summary": "List family members, paginated (cached)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated member list"
+          }
+        }
+      }
+    },
+    "/family/view-hof": {
+      "post": {
+        "tags": [
+          "Family"
+        ],
+        "summary": "View the calling HOF's family details (cached)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Family details"
+          },
+          "404": {
+            "description": "No family created yet"
+          }
+        }
+      }
+    },
+    "/family/get-id": {
+      "get": {
+        "tags": [
+          "Family"
+        ],
+        "summary": "Get the calling HOF's family ID",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Family ID"
+          },
+          "404": {
+            "description": "No family created yet"
+          }
+        }
+      }
+    },
+    "/family/view-member": {
+      "post": {
+        "tags": [
+          "Family"
+        ],
+        "summary": "View family details as a member (cached)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Family details"
+          },
+          "403": {
+            "description": "Not a member of this family"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Detailed health check (DB state, memory)",
+        "responses": {
+          "200": {
+            "description": "Service is healthy"
+          },
+          "503": {
+            "description": "Service is degraded"
+          }
+        }
+      }
+    },
+    "/messaging/keys": {
+      "post": {
+        "tags": [
+          "Messaging"
+        ],
+        "summary": "Publish/replace this account's public key material and top up one-time prekeys",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "identityKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "registrationId": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "signedPreKey": {
+                    "type": "object",
+                    "properties": {
+                      "keyId": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "publicKey": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "signature": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "keyId",
+                      "publicKey",
+                      "signature"
+                    ]
+                  },
+                  "oneTimePreKeys": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "keyId": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "publicKey": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "keyId",
+                        "publicKey"
+                      ]
+                    },
+                    "minItems": 1,
+                    "maxItems": 200
+                  }
+                },
+                "required": [
+                  "identityKey",
+                  "registrationId",
+                  "signedPreKey",
+                  "oneTimePreKeys"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Keys registered"
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/messaging/keys/{accountType}/{accountId}": {
+      "get": {
+        "tags": [
+          "Messaging"
+        ],
+        "summary": "Fetch another family member's prekey bundle to start a new session (X3DH)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "user",
+                "hof"
+              ]
+            },
+            "required": true,
+            "name": "accountType",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "accountId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Prekey bundle retrieved (oneTimePreKey may be null if that account's supply is exhausted)"
+          },
+          "403": {
+            "description": "Target is not a member of the caller's family"
+          },
+          "404": {
+            "description": "Target has not published keys yet"
+          }
+        }
+      }
+    },
+    "/messaging/messages": {
+      "post": {
+        "tags": [
+          "Messaging"
+        ],
+        "summary": "Send an encrypted message (ciphertext is opaque to this server)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "recipientType": {
+                    "type": "string",
+                    "enum": [
+                      "user",
+                      "hof"
+                    ]
+                  },
+                  "recipientId": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{24}$"
+                  },
+                  "ciphertext": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "messageType": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "enum": [
+                          1
+                        ]
+                      },
+                      {
+                        "type": "number",
+                        "enum": [
+                          3
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "recipientType",
+                  "recipientId",
+                  "ciphertext",
+                  "messageType"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Message sent"
+          },
+          "403": {
+            "description": "Recipient is not a member of the caller's family"
+          }
+        }
+      }
+    },
+    "/messaging/messages/{withAccountType}/{withAccountId}": {
+      "get": {
+        "tags": [
+          "Messaging"
+        ],
+        "summary": "Fetch conversation history with another family member, paginated",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "user",
+                "hof"
+              ]
+            },
+            "required": true,
+            "name": "withAccountType",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "withAccountId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "maximum": 100,
+              "default": 50
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conversation retrieved"
+          },
+          "403": {
+            "description": "Not a member of the caller's family"
+          }
+        }
+      }
+    },
+    "/messaging/messages/{messageId}/read": {
+      "patch": {
+        "tags": [
+          "Messaging"
+        ],
+        "summary": "Mark a message as read (only the actual recipient can)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "messageId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Marked as read"
+          },
+          "404": {
+            "description": "Message not found (or you're not its recipient)"
+          }
+        }
+      }
+    }
+  }
+}
